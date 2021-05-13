@@ -15,12 +15,17 @@
 #   $ export LXD_KEY_FILENAME=/tmp/lxd.key
 
 import os
-
+import re
+import logging
+import warnings
 from datetime import datetime, timedelta
+
 import pylxd
 
+warnings.filterwarnings('ignore', module='urllib3.connectionpool')
+
 # Insert local LXD server here
-endpoint = 'https://10.20.5.1:8443'
+endpoint = os.getenv("LXD_SERVER_URL") or 'https://10.20.5.1:8443'
 
 _cert = os.getenv("LXD_CERT_FILENAME")
 _key = os.getenv("LXD_KEY_FILENAME")
@@ -28,7 +33,7 @@ _key = os.getenv("LXD_KEY_FILENAME")
 cert = (_cert, _key)
 
 client = pylxd.Client(endpoint=endpoint, cert=cert, verify=False)
-inst_name = 'pytest-lxd-foo2'
+inst_name = 'pytest-lxd-foo3'
 image_name = 'ubuntu/focal'
 
 cfg = {'name': inst_name,
@@ -41,4 +46,4 @@ instance.start(wait=True)
 while True:
     start = datetime.utcnow()
     instance.execute(['hostname'])
-    print(datetime.utcnow() - start)
+    print(">>> ", datetime.utcnow() - start)
